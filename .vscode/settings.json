@@ -1,0 +1,6 @@
+{
+    "yaml.schemas": {
+        "file:///c%3A/Users/msing/.vscode/extensions/atlassian.atlascode-3.0.9/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+        "file:///c%3A/Users/msing/.vscode/extensions/ms-python.python-2023.22.1/schemas/conda-environment.json": "file:///c%3A/Users/msing/Documents/bitbucket_repos/re-rosetta-neurons/rosetta.yml"
+    }
+}
