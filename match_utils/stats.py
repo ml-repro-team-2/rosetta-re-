@@ -1,6 +1,8 @@
 import torch,torchvision
 import tqdm
 
+from networks.clip import clip_mean, clip_std
+
 def get_mean_std(gan,gan_layers,discr,discr_layers,gan_mode,discr_mode,dataset,epochs,batch_size,device):
     '''Get the activation statistics from GAN and discr'''
     print("Collecting Dataset Statistics")
@@ -31,10 +33,16 @@ def get_mean_std(gan,gan_layers,discr,discr_layers,gan_mode,discr_mode,dataset,e
                                     torch.std(gan_activation,dim=-1).unsqueeze(0).unsqueeze(2).unsqueeze(3).to(device)))
                 
                 
-            #clip condition here
             img = torch.nn.functional.interpolate(img, size = (224,224), mode = "bicubic")
-            img = torchvision.transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))(img)
-            _=discr(img)
+            
+            if discr_mode == "clip":
+                img = torchvision.transforms.Normalize(clip_mean, clip_std)(img)
+                _ = discr.model.encode_image(img)
+                
+            else:
+                img = torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))(img)
+                _ = discr(img)  
+                
             for layer in discr_layers:   
                 discr_activation=discr._retrieve_retained(layer,clear=True)#B,C,H,H
                 

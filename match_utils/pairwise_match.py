@@ -6,6 +6,8 @@ import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
 
+from networks.clip import clip_mean, clip_std
+
 def get_BB(path,k=5):
     with open(os.path.join(path,'table.pkl'),"rb") as f:
         table=pickle.load(f)
@@ -52,8 +54,14 @@ viz_size=10):
         gan_activs=matching.store_activs(gan,gan_layers)   
         gan_unit_map=unit_layer_map(gan_activs)
         img = torch.nn.functional.interpolate(img, size = (224,224), mode = "bicubic")
-        img = torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))(img)
-        _ = discr(img)            
+        
+        if discr_mode == "clip":
+            img = torchvision.transforms.Normalize(clip_mean, clip_std)(img)
+            _ = discr.model.encode_image(img)
+            
+        else:
+            img = torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))(img)
+            _ = discr(img)            
         
         discr_activs = matching.store_activs(discr,discr_layers)
         gan_unit_map = unit_layer_map(gan_activs)
