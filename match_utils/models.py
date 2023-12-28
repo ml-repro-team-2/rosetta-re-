@@ -20,8 +20,8 @@ def load_gan(mode,device='cpu',path: Text='.'):
 
 def load_discr(mode, device, path:Text='../models'):
     if mode == 'mae':
-        # couldb't find mae_pretrain_vit_base.pth (except in 1 kaggle dataset) instead using a huggingface downloaded model
-        discr = mae.load(os.path.join(path, 'mae/vit-mae-base.pth')).to(device)
+        # download this from https://www.kaggle.com/datasets/firstderivative/mae-pretrain-vit-base and store in ../models/mae
+        discr = mae.load(os.path.join(path, 'mae/mae_pretrain_vit_base.pth')).to(device)
         #discr_layers = [f"blocks.{i}" for i in range(12)]
         discr_layers = []
         for name, layer in discr.named_modules():
