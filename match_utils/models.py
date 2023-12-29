@@ -34,7 +34,20 @@ def load_discr(mode, device, path:Text='../models'):
         discr_layers = [ "visual.layer1", "visual.layer2", "visual.layer3", "visual.layer4"]
         for p in discr.parameters(): 
             p.data = p.data.float()
-    
+    elif mode == "dino":
+        discr = torch.hub.load('facebookresearch/dino:main', 'dino_resnet50').to(device)
+        for p in discr.parameters(): 
+            p.data = p.data.float() 
+        discr_layers = [ "layer1", "layer2", "layer3", "layer4"]
+    elif mode in ['dino_vitb16', 'dino_vitb8']:
+        discr = torch.hub.load('facebookresearch/dino:main', mode).to(device)
+        for p in discr.parameters(): 
+            p.data = p.data.float() 
+        
+        discr_layers = []
+        for name, layer in discr.named_modules():
+            if  "mlp.act" in name:
+                discr_layers.append(name)
     elif mode == "resnet50":
         discr=resnet50(num_classes=1000,pretrained='imagenet').to(device)
         discr_layers = [ "layer1", "layer2", "layer3", "layer4"]
