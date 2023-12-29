@@ -5,6 +5,9 @@ import numpy as np
 import pickle
 import os
 import tqdm
+from networks.clip import clip_mean, clip_std
+
+
 def normalize(activation,stats_table):
     eps=1e-5
     norm_input=(activation-stats_table[0])/(stats_table[1]+eps)
@@ -57,11 +60,16 @@ def activ_match_gan(gan, gan_layers, discr,discr_layers, gan_mode, discr_mode,\
             del z
             del c
             gan_activs=store_activs(gan,gan_layers)
-
-            #clip condition
+            
             img = torch.nn.functional.interpolate(img, size = (224,224), mode = "bicubic")
-            img = torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))(img)
-            _ = discr(img)
+
+            if discr_mode == "clip":
+                img = torchvision.transforms.Normalize(clip_mean, clip_std)(img)
+                _ = discr.model.encode_image(img)
+                
+            else:
+                img = torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))(img)
+                _ = discr(img)                    
             del img
             discr_activs=store_activs(discr,discr_layers)
             if iteration==0:
